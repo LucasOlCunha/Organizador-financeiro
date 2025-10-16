@@ -1,0 +1,21 @@
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Editor / IDE
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.log
+.DS_Store
+
+# Mac / Windows
+Thumbs.db
+.DS_Store
+
+# Temp / Build
+dist/
+build/
+.env

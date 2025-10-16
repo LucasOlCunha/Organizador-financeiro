@@ -1,0 +1,31 @@
+{
+  "name": "organizador-financeiro",
+  "version": "1.0.0",
+  "description": "Um site de **organização financeira** para ajudar o usuário a controlar entradas, saídas e visualizar seu saldo de forma simples e intuitiva.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon backend/src/index.js",
+    "start": "node backend/src/index.js",
+    "hello": "node backend/src/hello.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LucasOlCunha/Organizador-financeiro.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/LucasOlCunha/Organizador-financeiro/issues"
+  },
+  "homepage": "https://github.com/LucasOlCunha/Organizador-financeiro#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "pg": "^8.16.3"
+  }
+}
