@@ -4,9 +4,8 @@
   "description": "Um site de **organização financeira** para ajudar o usuário a controlar entradas, saídas e visualizar seu saldo de forma simples e intuitiva.",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon backend/src/index.js",
-    "start": "node backend/src/index.js",
-    "hello": "node backend/src/hello.js",
+    "dev": "nodemon backend/src/app.js",
+    "start": "node backend/src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,7 +15,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/LucasOlCunha/Organizador-financeiro/issues"
   },
@@ -25,6 +24,7 @@
     "nodemon": "^3.1.10"
   },
   "dependencies": {
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "pg": "^8.16.3"
   }
