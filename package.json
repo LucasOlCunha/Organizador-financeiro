@@ -10,6 +10,7 @@
     "start": "node backend/src/app.js",
     "db:clear-users": "node backend/scripts/clear_users.js",
   "db:create-categories": "node backend/scripts/create_categories.js",
+  "db:add-categories-userid": "node backend/scripts/add_userid_to_categories.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

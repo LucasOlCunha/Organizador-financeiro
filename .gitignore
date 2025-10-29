@@ -21,3 +21,4 @@ build/
 .env
 
 /data/
+/insomnia/
