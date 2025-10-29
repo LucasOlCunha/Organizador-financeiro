@@ -1,0 +1,168 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-10-29T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:2025.6.0",
+  "resources": [
+    {
+      "_id": "wrk_organizador",
+      "_type": "workspace",
+      "name": "Organizador-financeiro",
+      "description": "API workspace for Organizador-financeiro",
+      "created": 1698537600000,
+      "modified": 1698537600000
+    },
+    {
+      "_id": "env_base",
+      "_type": "environment",
+      "parentId": "wrk_organizador",
+      "name": "Base Environment",
+      "data": {
+        "jwt": ""
+      },
+      "created": 1698537600000,
+      "modified": 1698537600000
+    },
+    {
+      "_id": "req_register",
+      "_type": "request",
+      "parentId": "wrk_organizador",
+      "name": "Register User",
+      "method": "POST",
+      "url": "http://localhost:3000/users/register",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "created": 1698537600000,
+      "modified": 1698537600000
+    },
+    {
+      "_id": "req_login",
+      "_type": "request",
+      "parentId": "wrk_organizador",
+      "name": "Login (get JWT)",
+      "method": "POST",
+      "url": "http://localhost:3000/users/login",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "created": 1698537600000,
+      "modified": 1698537600000
+    },
+    {
+      "_id": "req_me",
+      "_type": "request",
+      "parentId": "wrk_organizador",
+      "name": "Get current user (me)",
+      "method": "GET",
+      "url": "http://localhost:3000/users/me",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ jwt }}"
+        }
+      ],
+      "created": 1698537600000,
+      "modified": 1698537600000
+    }
+    ,
+    {
+      "_id": "req_cat_list",
+      "_type": "request",
+      "parentId": "wrk_organizador",
+      "name": "List Categories",
+      "method": "GET",
+      "url": "http://localhost:3000/categories",
+      "created": 1698537600000,
+      "modified": 1698537600000
+    },
+    {
+      "_id": "req_cat_get",
+      "_type": "request",
+      "parentId": "wrk_organizador",
+      "name": "Get Category by ID",
+      "method": "GET",
+      "url": "http://localhost:3000/categories/1",
+      "created": 1698537600000,
+      "modified": 1698537600000
+    },
+    {
+      "_id": "req_cat_create",
+      "_type": "request",
+      "parentId": "wrk_organizador",
+      "name": "Create Category",
+      "method": "POST",
+      "url": "http://localhost:3000/categories",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Salário\",\n  \"tipo\": \"receita\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ jwt }}"
+        }
+      ],
+      "created": 1698537600000,
+      "modified": 1698537600000
+    },
+    {
+      "_id": "req_cat_update",
+      "_type": "request",
+      "parentId": "wrk_organizador",
+      "name": "Update Category",
+      "method": "PATCH",
+      "url": "http://localhost:3000/categories/1",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Salário Mensal\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ jwt }}"
+        }
+      ],
+      "created": 1698537600000,
+      "modified": 1698537600000
+    },
+    {
+      "_id": "req_cat_delete",
+      "_type": "request",
+      "parentId": "wrk_organizador",
+      "name": "Delete Category",
+      "method": "DELETE",
+      "url": "http://localhost:3000/categories/1",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ jwt }}"
+        }
+      ],
+      "created": 1698537600000,
+      "modified": 1698537600000
+    }
+  ]
+}

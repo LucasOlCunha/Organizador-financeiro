@@ -1,11 +1,33 @@
 import express from "express";
-import usuariosRouter from "./routes/usuarios.js";
+import usersRouter from "./routes/users.js";
+import pool from "./db.js";
+import categoriesRouter from "./routes/categories.js";
 
 const app = express();
 app.use(express.json());
 
-app.use("/usuarios", usuariosRouter);
+// Rota base
+app.get("/", (req, res) => {
+  res.send("Servidor rodando 🚀");
+});
 
-app.listen(3000, () =>
-  console.log("Servidor rodando em http://localhost:3000")
+// Rota de teste que consulta o banco
+app.get("/teste", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT NOW()");
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Erro no banco!");
+  }
+});
+
+// Conecta as rotas de usuários
+app.use("/users", usersRouter);
+// Conecta as rotas de categorias
+app.use("/categories", categoriesRouter);
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () =>
+  console.log(`✅ Servidor rodando em http://localhost:${PORT}`)
 );

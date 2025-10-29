@@ -1,7 +1,13 @@
-const express = require("express");
-const app = express();
-const pool = require("./db");
+// This file intentionally exports the configured Express app without starting a server.
+// The actual server entrypoint is `app.js` which calls `app.listen(...)`.
+import express from "express";
+import pool from "./db.js";
+import usersRouter from "./routes/users.js";
 
+const app = express();
+app.use(express.json());
+
+// Health/test route (uses DB)
 app.get("/teste", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
@@ -12,6 +18,7 @@ app.get("/teste", async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log("Servidor rodando na porta 3000");
-});
+// Mount users routes
+app.use("/users", usersRouter);
+
+export default app;

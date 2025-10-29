@@ -4,8 +4,12 @@
   "description": "Um site de **organização financeira** para ajudar o usuário a controlar entradas, saídas e visualizar seu saldo de forma simples e intuitiva.",
   "main": "index.js",
   "scripts": {
+    "services:up": "docker compose up -d",
+    "services:down": "docker compose down",
     "dev": "nodemon backend/src/app.js",
     "start": "node backend/src/app.js",
+    "db:clear-users": "node backend/scripts/clear_users.js",
+  "db:create-categories": "node backend/scripts/create_categories.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -24,8 +28,10 @@
     "nodemon": "^3.1.10"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "jsonwebtoken": "^9.0.0"
   }
 }
