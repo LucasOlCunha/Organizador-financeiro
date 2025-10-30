@@ -8,7 +8,7 @@ const auth = (req, res, next) => {
 
   const token = authHeader.split(" ")[1];
   try {
-    const secret = process.env.JWT_SECRET || "CHANGE_ME_PLEASE";
+    const secret = process.env.JWT_SECRET || "secret";
     const payload = jwt.verify(token, secret);
     // attach basic payload to request
     req.user = payload;

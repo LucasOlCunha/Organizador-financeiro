@@ -21,7 +21,7 @@ async function seed() {
   if (!confirmed) {
     console.log("This will INSERT sample categories into `categories`.");
     console.log(
-      "Run with --yes to actually execute: node backend/scripts/seed_categories.js --yes"
+      "Run with --yes to actually execute: node scripts/seed_categories.js --yes"
     );
     console.log("Or set env: CONFIRM_SEED=true");
     process.exit(1);

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Safe script to delete all rows from users table.
 // Usage:
-//   node backend/scripts/clear_users.js --yes
+//   node scripts/clear_users.js --yes
 // or
 //   npm run db:clear-users
 
@@ -15,7 +15,7 @@ async function clearUsers() {
   if (!confirmed) {
     console.log("This will DELETE ALL rows from the 'users' table.");
     console.log("To actually run this script, re-run with the --yes flag:");
-    console.log("  node backend/scripts/clear_users.js --yes");
+    console.log("  node scripts/clear_users.js --yes");
     console.log("Or set environment variable: CONFIRM_DELETE=true");
     process.exit(1);
   }
