@@ -2,6 +2,7 @@ import express from "express";
 import usersRouter from "./routes/users.js";
 import pool from "./db.js";
 import categoriesRouter from "./routes/categories.js";
+import transactionsRouter from "./routes/transactions.js";
 
 const app = express();
 
@@ -34,6 +35,8 @@ app.get("/teste", async (req, res) => {
 app.use("/users", usersRouter);
 // Conecta as rotas de categorias
 app.use("/categories", categoriesRouter);
+// Conecta as rotas de transações
+app.use("/transactions", transactionsRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
