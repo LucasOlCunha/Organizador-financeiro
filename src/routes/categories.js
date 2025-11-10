@@ -1,5 +1,4 @@
 import express from "express";
-import pool from "../db.js";
 import auth from "../middleware/auth.js";
 import * as Category from "../models/category.js";
 import * as CategoriesCtrl from "../controllers/categoriesController.js";

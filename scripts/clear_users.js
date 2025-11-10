@@ -5,7 +5,7 @@
 // or
 //   npm run db:clear-users
 
-import pool from "../src/db.js";
+import { prisma } from "../src/lib/prisma.js";
 
 const args = process.argv.slice(2);
 const confirmed =
@@ -22,19 +22,16 @@ async function clearUsers() {
 
   try {
     console.log("Deleting all users from database...");
-    const res = await pool.query("DELETE FROM users RETURNING id");
-    console.log(`Deleted ${res.rowCount} user(s).`);
+    const res = await prisma.user.deleteMany();
+    console.log(`Deleted ${res.count} user(s).`);
     process.exit(0);
   } catch (err) {
     console.error("Error deleting users:", err.message || err);
     process.exit(2);
   } finally {
-    // close pool
     try {
-      await pool.end();
-    } catch (e) {
-      /* ignore */
-    }
+      await prisma.$disconnect();
+    } catch (e) {}
   }
 }
 

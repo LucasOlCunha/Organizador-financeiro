@@ -22,3 +22,4 @@ build/
 
 /data/
 /insomnia/
+/src/generated/prisma

@@ -1,14 +1,9 @@
-import pg from "pg";
-import dotenv from "dotenv";
+// This file used to provide a pg Pool. The project has been migrated to Prisma.
+// Keep this stub to avoid accidental imports; prefer importing the centralized
+// Prisma client from `src/lib/prisma.js`.
 
-dotenv.config();
-
-const pool = new pg.Pool({
-  host: process.env.PGHOST,
-  user: process.env.PGUSER,
-  password: process.env.PGPASSWORD,
-  database: process.env.PGDATABASE,
-  port: process.env.PGPORT,
-});
-
-export default pool;
+export default function deprecatedDb() {
+  throw new Error(
+    "src/db.js is deprecated. Use the Prisma client from './lib/prisma.js' instead."
+  );
+}

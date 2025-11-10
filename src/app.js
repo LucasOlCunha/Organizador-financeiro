@@ -1,15 +1,24 @@
 import express from "express";
+import cors from "cors";
 import usersRouter from "./routes/users.js";
-import pool from "./db.js";
+import { prisma } from "./lib/prisma.js";
 import categoriesRouter from "./routes/categories.js";
 import transactionsRouter from "./routes/transactions.js";
 
 const app = express();
 
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*"); // allow all origins
-  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
   next();
 });
 
@@ -20,11 +29,11 @@ app.get("/", (req, res) => {
   res.send("Servidor rodando 🚀");
 });
 
-// Rota de teste que consulta o banco
+// Rota de teste que consulta o banco via Prisma
 app.get("/teste", async (req, res) => {
   try {
-    const result = await pool.query("SELECT NOW()");
-    res.json(result.rows);
+    const result = await prisma.$queryRaw`SELECT NOW()`;
+    res.json(result);
   } catch (err) {
     console.error(err);
     res.status(500).send("Erro no banco!");
@@ -39,6 +48,33 @@ app.use("/categories", categoriesRouter);
 app.use("/transactions", transactionsRouter);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () =>
+const server = app.listen(PORT, () =>
   console.log(`✅ Servidor rodando em http://localhost:${PORT}`)
 );
+
+async function shutdown(signal) {
+  console.log(`Received ${signal}. Shutting down...`);
+  try {
+    // Close HTTP server first
+    if (server && server.close) {
+      await new Promise((resolve) => server.close(resolve));
+    }
+    // Disconnect Prisma
+    if (prisma && prisma.$disconnect) {
+      await prisma.$disconnect();
+    }
+    console.log("Shutdown complete.");
+    process.exit(0);
+  } catch (err) {
+    console.error("Error during shutdown:", err);
+    process.exit(1);
+  }
+}
+
+process.on("SIGINT", () => shutdown("SIGINT"));
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("beforeExit", () => shutdown("beforeExit"));
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught exception:", err);
+  shutdown("uncaughtException");
+});

@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 
 const auth = (req, res, next) => {
+  if (req.method === "OPTIONS") return next();
   const authHeader = req.headers.authorization || req.headers.Authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ erro: "Token não fornecido." });

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import * as User from "../src/models/user.js";
-import pool from "../src/db.js";
+import { prisma } from "../src/lib/prisma.js";
 
 async function main() {
   const name = "Seed Test User";
@@ -16,9 +16,7 @@ async function main() {
       console.log("Created user:", { id: user.id, email: user.email });
     }
 
-    await pool.query("BEGIN");
-
-    // Deduplica categorias globais por 'nome'
+    // Use raw SQL to dedupe global categories, then update remaining to user
     const dedupSql = `
       WITH dups AS (
         SELECT id, nome,
@@ -34,38 +32,31 @@ async function main() {
       )
       SELECT COUNT(*) AS removed_count FROM removed;
     `;
-    const dedupRes = await pool.query(dedupSql);
-    console.log(
-      "Removed global duplicate categories:",
-      dedupRes.rows[0].removed_count
-    );
+    const dedupRes = await prisma.$queryRawUnsafe(dedupSql);
+    const removedCount =
+      Array.isArray(dedupRes) && dedupRes[0]
+        ? dedupRes[0].removed_count || dedupRes[0].removed_count
+        : 0;
+    console.log("Removed global duplicate categories:", removedCount);
 
-    // Atribui as remanescentes ao usuário
-    const updateRes = await pool.query(
-      `UPDATE categories
-         SET user_id = $1
-       WHERE user_id IS NULL
-       RETURNING id, nome`,
-      [user.id]
+    // Assign remaining global categories to user
+    const updateRes = await prisma.$executeRawUnsafe(
+      `UPDATE categories SET user_id = ${user.id} WHERE user_id IS NULL RETURNING id, nome`
     );
-
-    console.log(
-      `Assigned ${updateRes.rowCount} categories to user id=${user.id}`
-    );
-    if (updateRes.rowCount > 0) {
-      console.log("Sample updated categories:", updateRes.rows.slice(0, 10));
-    }
-
-    await pool.query("COMMIT");
+    // $executeRawUnsafe returns command completion for DDL/DML in some drivers; fetch assigned rows separately
+    const assigned = await prisma.category.findMany({
+      where: { user_id: user.id },
+      orderBy: { id: "asc" },
+    });
+    console.log(`Assigned ${assigned.length} categories to user id=${user.id}`);
+    if (assigned.length > 0)
+      console.log("Sample updated categories:", assigned.slice(0, 10));
   } catch (err) {
     console.error("Error:", err);
-    try {
-      await pool.query("ROLLBACK");
-    } catch (_) {}
     process.exitCode = 1;
   } finally {
     try {
-      await pool.end();
+      await prisma.$disconnect();
     } catch (_) {}
   }
 }

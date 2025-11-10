@@ -1,80 +1,92 @@
-import pool from "../db.js";
+import { prisma } from "../lib/prisma.js";
 
-// Data access layer for categories
+// Data access layer for categories (Prisma)
 export async function findAll(userId = null) {
   if (userId) {
-    const res = await pool.query(
-      "SELECT id, nome, tipo, data_criacao FROM categories WHERE user_id = $1 ORDER BY id",
-      [userId]
-    );
-    return res.rows;
+    return await prisma.category.findMany({
+      where: { user_id: Number(userId) },
+      select: { id: true, nome: true, tipo: true, data_criacao: true },
+      orderBy: { id: "asc" },
+    });
   }
-  const res = await pool.query(
-    "SELECT id, nome, tipo, data_criacao, user_id FROM categories ORDER BY id"
-  );
-  return res.rows;
+  return await prisma.category.findMany({
+    select: {
+      id: true,
+      nome: true,
+      tipo: true,
+      data_criacao: true,
+      user_id: true,
+    },
+    orderBy: { id: "asc" },
+  });
 }
 
 export async function findById(id) {
-  const res = await pool.query(
-    "SELECT id, nome, tipo, data_criacao, user_id FROM categories WHERE id = $1",
-    [id]
-  );
-  return res.rows[0] || null;
+  return await prisma.category.findUnique({
+    where: { id: Number(id) },
+    select: {
+      id: true,
+      nome: true,
+      tipo: true,
+      data_criacao: true,
+      user_id: true,
+    },
+  });
 }
 
 export async function create({ nome, tipo, user_id = null }) {
-  const res = await pool.query(
-    "INSERT INTO categories (nome, tipo, user_id) VALUES ($1, $2, $3) RETURNING id, nome, tipo, data_criacao, user_id",
-    [nome, tipo, user_id]
-  );
-  return res.rows[0];
+  return await prisma.category.create({
+    data: { nome, tipo, user_id: user_id ? Number(user_id) : null },
+    select: {
+      id: true,
+      nome: true,
+      tipo: true,
+      data_criacao: true,
+      user_id: true,
+    },
+  });
 }
 
 export async function update(id, fields, ownerId = null) {
-  const sets = [];
-  const values = [];
-  let idx = 1;
-  if (fields.nome !== undefined) {
-    sets.push(`nome = $${idx++}`);
-    values.push(fields.nome);
-  }
-  if (fields.tipo !== undefined) {
-    sets.push(`tipo = $${idx++}`);
-    values.push(fields.tipo);
-  }
-  if (sets.length === 0) return null;
-  // WHERE clause: enforce ownerId if provided
+  // if ownerId is provided, use updateMany to enforce ownership then fetch
   if (ownerId) {
-    values.push(id);
-    values.push(ownerId);
-    const sql = `UPDATE categories SET ${sets.join(
-      ", "
-    )} WHERE id = $${idx} AND user_id = $${
-      idx + 1
-    } RETURNING id, nome, tipo, data_criacao, user_id`;
-    const res = await pool.query(sql, values);
-    return res.rows[0] || null;
+    const res = await prisma.category.updateMany({
+      where: { id: Number(id), user_id: Number(ownerId) },
+      data: { ...fields },
+    });
+    if (res.count === 0) return null;
+    return await findById(id);
   }
-  values.push(id);
-  const sql = `UPDATE categories SET ${sets.join(
-    ", "
-  )} WHERE id = $${idx} RETURNING id, nome, tipo, data_criacao, user_id`;
-  const res = await pool.query(sql, values);
-  return res.rows[0] || null;
+
+  try {
+    return await prisma.category.update({
+      where: { id: Number(id) },
+      data: { ...fields },
+      select: {
+        id: true,
+        nome: true,
+        tipo: true,
+        data_criacao: true,
+        user_id: true,
+      },
+    });
+  } catch (e) {
+    return null;
+  }
 }
 
 export async function remove(id, ownerId = null) {
   if (ownerId) {
-    const res = await pool.query(
-      "DELETE FROM categories WHERE id = $1 AND user_id = $2 RETURNING id",
-      [id, ownerId]
-    );
-    return res.rows[0] || null;
+    const res = await prisma.category.deleteMany({
+      where: { id: Number(id), user_id: Number(ownerId) },
+    });
+    return res.count === 0 ? null : { id };
   }
-  const res = await pool.query(
-    "DELETE FROM categories WHERE id = $1 RETURNING id",
-    [id]
-  );
-  return res.rows[0] || null;
+
+  try {
+    const r = await prisma.category.delete({ where: { id: Number(id) } });
+    return { id: r.id };
+  } catch (e) {
+    return null;
+  }
 }

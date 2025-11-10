@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import pool from "../src/db.js";
+import { prisma } from "../src/lib/prisma.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -7,12 +7,12 @@ dotenv.config();
 async function run() {
   try {
     console.log("Adding user_id column to categories (if not exists)");
-    await pool.query(
+    await prisma.$executeRawUnsafe(
       "ALTER TABLE categories ADD COLUMN IF NOT EXISTS user_id INTEGER"
     );
 
     console.log("Adding foreign key constraint if not exists");
-    await pool.query(`DO $$
+    await prisma.$executeRawUnsafe(`DO $$
     BEGIN
       IF NOT EXISTS (
         SELECT 1 FROM pg_constraint WHERE conname = 'categories_user_id_fkey'
@@ -22,7 +22,7 @@ async function run() {
     END$$;`);
 
     console.log("Creating index on user_id if not exists");
-    await pool.query(
+    await prisma.$executeRawUnsafe(
       "CREATE INDEX IF NOT EXISTS idx_categories_user_id ON categories(user_id)"
     );
 
@@ -32,7 +32,7 @@ async function run() {
     process.exitCode = 2;
   } finally {
     try {
-      await pool.end();
+      await prisma.$disconnect();
     } catch (e) {}
   }
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from "fs/promises";
 import path from "path";
-import pool from "../src/db.js";
+import { prisma } from "../src/lib/prisma.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -12,7 +12,7 @@ async function run() {
   try {
     const sql = await fs.readFile(sqlPath, "utf8");
     console.log("Running SQL migration:", sqlPath);
-    const res = await pool.query(sql);
+    await prisma.$executeRawUnsafe(sql);
     console.log("Migration executed.");
     // res will be command completion; not always helpful for DDL
   } catch (err) {
@@ -20,7 +20,7 @@ async function run() {
     process.exitCode = 2;
   } finally {
     try {
-      await pool.end();
+      await prisma.$disconnect();
     } catch (e) {}
   }
 }

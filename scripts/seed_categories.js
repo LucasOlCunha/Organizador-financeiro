@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import pool from "../src/db.js";
+import { prisma } from "../src/lib/prisma.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -27,27 +27,18 @@ async function seed() {
     process.exit(1);
   }
 
-  const client = await pool.connect();
   try {
-    await client.query("BEGIN");
-    let inserted = 0;
-    for (const cat of categories) {
-      const res = await client.query(
-        "INSERT INTO categories (nome, tipo) VALUES ($1, $2) RETURNING id",
-        [cat.nome, cat.tipo]
-      );
-      if (res.rows.length > 0) inserted += 1;
-    }
-    await client.query("COMMIT");
-    console.log(`Inserted ${inserted} categories.`);
+    const creates = categories.map((cat) =>
+      prisma.category.create({ data: { nome: cat.nome, tipo: cat.tipo } })
+    );
+    const res = await prisma.$transaction(creates);
+    console.log(`Inserted ${res.length} categories.`);
   } catch (err) {
-    await client.query("ROLLBACK");
     console.error("Seed failed:", err.message || err);
     process.exitCode = 2;
   } finally {
-    client.release();
     try {
-      await pool.end();
+      await prisma.$disconnect();
     } catch (e) {}
   }
 }
