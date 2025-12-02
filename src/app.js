@@ -4,6 +4,7 @@ import usersRouter from "./routes/users.js";
 import { prisma } from "./lib/prisma.js";
 import categoriesRouter from "./routes/categories.js";
 import transactionsRouter from "./routes/transactions.js";
+import balanceRouter from "./routes/balance.js";
 
 const app = express();
 
@@ -46,6 +47,8 @@ app.use("/users", usersRouter);
 app.use("/categories", categoriesRouter);
 // Conecta as rotas de transações
 app.use("/transactions", transactionsRouter);
+// Conecta as rotas de balanço
+app.use("/balance", balanceRouter);
 
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () =>

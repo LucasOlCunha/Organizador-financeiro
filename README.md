@@ -113,6 +113,13 @@ API estará em `http://localhost:3000` por padrão.
 - Migrations SQL em `scripts/*.sql` são executadas com `prisma.$executeRawUnsafe` / `$queryRawUnsafe` — adequado para scripts controlados, não para entrada do usuário.
 - `src/app.js` possui hooks de shutdown que chamam `prisma.$disconnect()`.
 
+## Soft-delete
+As entidades `categories` e `transactions` agora usam soft-delete com a coluna `deleted_at` (timestamp nullable).
+- Para aplicar a coluna no banco (se ainda não existir), rode:
+	- `node scripts/add_deleted_at_columns.js`
+- Após isso, as operações de `DELETE` nas rotas e scripts marcam `deleted_at` com o timestamp atual em vez de remover a linha fisicamente.
+
+
 Se quiser, eu posso:
 - apagar `pg` do `package-lock.json` (executando `npm install` para regenerar),
 - adicionar um pequeno README mais extenso ou instruções Docker,

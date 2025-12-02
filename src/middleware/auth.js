@@ -1,23 +1,25 @@
+// middleware/auth.js
 import jwt from "jsonwebtoken";
 
-const auth = (req, res, next) => {
-  if (req.method === "OPTIONS") return next();
-  const authHeader = req.headers.authorization || req.headers.Authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ erro: "Token não fornecido." });
-  }
+export default function auth(req, res, next) {
+  const header = req.headers.authorization;
+  if (!header) return res.status(401).json({ error: "Missing token" });
 
-  const token = authHeader.split(" ")[1];
+  const [scheme, token] = header.split(" ");
+  if (scheme !== "Bearer" || !token)
+    return res.status(401).json({ error: "Invalid token format" });
+
   try {
-    const secret = process.env.JWT_SECRET || "secret";
-    const payload = jwt.verify(token, secret);
-    // attach basic payload to request
-    req.user = payload;
+    const payload = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "CHANGE_ME_PLEASE"
+    );
+    const id = Number(payload?.id ?? payload?.userId ?? payload?.sub);
+    if (!id) return res.status(401).json({ error: "Invalid token payload" });
+
+    req.user = { id };
     next();
   } catch (err) {
-    console.error("JWT verification error:", err.message);
-    return res.status(401).json({ erro: "Token inválido." });
+    return res.status(401).json({ error: "Invalid token" });
   }
-};
-
-export default auth;
+}

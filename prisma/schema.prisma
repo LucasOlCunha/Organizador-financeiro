@@ -14,22 +14,26 @@ datasource db {
 }
 
 model User {
-  id            Int           @id @default(autoincrement())
-  name          String
-  email         String        @unique
-  password      String
-  data_criacao  DateTime      @default(now())
-  categories    Category[]
-  transactions  Transaction[]
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  password     String
+  data_criacao DateTime      @default(now())
+  categories   Category[]
+  transactions Transaction[]
+
+  saldo_inicial Decimal      @db.Decimal(14, 2) @default(0.00)
 
   @@map("users")
 }
+
 
 model Category {
   id           Int           @id @default(autoincrement())
   nome         String
   tipo         String
   data_criacao DateTime      @default(now())
+  deleted_at   DateTime?
   user         User?         @relation(fields: [user_id], references: [id])
   user_id      Int?
   transactions Transaction[]
@@ -40,8 +44,9 @@ model Category {
 model Transaction {
   id           Int       @id @default(autoincrement())
   descricao    String
-  valor        Decimal   @db.Decimal(14,2)
+  valor        Decimal   @db.Decimal(14, 2)
   tipo         String
+  deleted_at   DateTime?
   categoria    Category? @relation(fields: [categoria_id], references: [id])
   categoria_id Int?
   user         User?     @relation(fields: [user_id], references: [id])

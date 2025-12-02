@@ -12,7 +12,7 @@ router.get("/:id", auth, CategoriesCtrl.getCategory);
 
 router.post("/", auth, CategoriesCtrl.createCategory);
 
-router.patch("/:id", auth, CategoriesCtrl.updateCategory);
+router.put("/:id", auth, CategoriesCtrl.updateCategory);
 
 router.delete("/:id", auth, CategoriesCtrl.deleteCategory);
 
