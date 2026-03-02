@@ -29,7 +29,8 @@ export async function getTransaction(req, res) {
 }
 
 export async function createTransaction(req, res) {
-  const { descricao, valor, tipo, categoria_id } = req.body;
+  const { descricao, valor, tipo, categoria_id, banco_id, data_criacao } =
+    req.body;
   if (!descricao || valor === undefined || !tipo)
     return res.status(400).json({ erro: "Preencha descricao, valor e tipo." });
   if (!["receita", "despesa"].includes(tipo))
@@ -44,6 +45,8 @@ export async function createTransaction(req, res) {
       valor,
       tipo,
       categoria_id,
+      banco_id,
+      data_criacao,
       user_id: userId,
     });
     res.status(201).json(created);
@@ -55,7 +58,8 @@ export async function createTransaction(req, res) {
 
 export async function updateTransaction(req, res) {
   const id = Number(req.params.id);
-  const { descricao, valor, tipo, categoria_id } = req.body;
+  const { descricao, valor, tipo, categoria_id, banco_id, data_criacao } =
+    req.body;
   if (!Number.isInteger(id))
     return res.status(400).json({ erro: "ID inválido." });
   if (tipo && !["receita", "despesa"].includes(tipo))
@@ -66,7 +70,7 @@ export async function updateTransaction(req, res) {
   try {
     const updated = await Transaction.update(
       id,
-      { descricao, valor, tipo, categoria_id },
+      { descricao, valor, tipo, categoria_id, banco_id, data_criacao },
       req.user.id
     );
     if (!updated)

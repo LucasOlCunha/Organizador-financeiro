@@ -14,6 +14,7 @@ export async function findAll(userId = null, limit = 100) {
         valor: true,
         tipo: true,
         categoria_id: true,
+        banco_id: true,
         user_id: true,
         data_criacao: true,
         deleted_at: true,
@@ -30,6 +31,7 @@ export async function findAll(userId = null, limit = 100) {
       valor: true,
       tipo: true,
       categoria_id: true,
+      banco_id: true,
       user_id: true,
       data_criacao: true,
       deleted_at: true,
@@ -48,6 +50,7 @@ export async function findById(id) {
       valor: true,
       tipo: true,
       categoria_id: true,
+      banco_id: true,
       user_id: true,
       data_criacao: true,
       deleted_at: true,
@@ -60,6 +63,8 @@ export async function create({
   valor,
   tipo,
   categoria_id = null,
+  banco_id = null,
+  data_criacao = null,
   user_id = null,
 }) {
   return await prisma.transaction.create({
@@ -68,6 +73,8 @@ export async function create({
       valor: typeof valor === "number" ? String(valor) : valor,
       tipo,
       categoria_id: categoria_id ? Number(categoria_id) : null,
+      banco_id: banco_id ? Number(banco_id) : null,
+      data_criacao: data_criacao ? new Date(data_criacao) : new Date(),
       user_id: user_id ? Number(user_id) : null,
     },
     select: {
@@ -76,6 +83,7 @@ export async function create({
       valor: true,
       tipo: true,
       categoria_id: true,
+      banco_id: true,
       user_id: true,
       data_criacao: true,
       deleted_at: true,
@@ -94,6 +102,10 @@ export async function update(id, fields, ownerId = null) {
     data.categoria_id = fields.categoria_id
       ? Number(fields.categoria_id)
       : null;
+  if (fields.banco_id !== undefined)
+    data.banco_id = fields.banco_id ? Number(fields.banco_id) : null;
+  if (fields.data_criacao !== undefined)
+    data.data_criacao = new Date(fields.data_criacao);
 
   if (Object.keys(data).length === 0) return null;
 
@@ -149,7 +161,7 @@ export async function remove(id, ownerId = null) {
 
 export async function getBalance(
   userId = null,
-  { inicio = null, fim = null } = {}
+  { inicio = null, fim = null } = {},
 ) {
   const whereBase = {
     deleted_at: null,
@@ -169,7 +181,7 @@ export async function getBalance(
   const TIPO_RECEITA = "receita";
   const TIPO_DESPESA = "despesa";
 
-  const [receitasAgg, despesasAgg] = await Promise.all([
+  const [receitasAgg, despesasAgg, userAgg, banksAgg] = await Promise.all([
     prisma.transaction.aggregate({
       _sum: { valor: true },
       where: {
@@ -184,11 +196,26 @@ export async function getBalance(
         tipo: TIPO_DESPESA,
       },
     }),
+    userId
+      ? prisma.user.findUnique({
+          where: { id: Number(userId) },
+          select: { saldo_inicial: true },
+        })
+      : Promise.resolve({ saldo_inicial: 0 }),
+    userId
+      ? prisma.bank.aggregate({
+          _sum: { saldo_inicial: true },
+          where: { deleted_at: null, user_id: Number(userId) },
+        })
+      : Promise.resolve({ _sum: { saldo_inicial: 0 } }),
   ]);
 
   const totalReceitas = Number(receitasAgg._sum.valor || 0);
   const totalDespesas = Number(despesasAgg._sum.valor || 0);
-  const saldo = totalReceitas - totalDespesas;
+  const saldoInicial = Number(userAgg?.saldo_inicial || 0);
+  const totalBankInitialBalance = Number(banksAgg._sum.saldo_inicial || 0);
+  const saldo =
+    saldoInicial + totalBankInitialBalance + (totalReceitas - totalDespesas);
 
   return {
     totalReceitas,

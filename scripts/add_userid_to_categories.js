@@ -8,7 +8,7 @@ async function run() {
   try {
     console.log("Adding user_id column to categories (if not exists)");
     await prisma.$executeRawUnsafe(
-      "ALTER TABLE categories ADD COLUMN IF NOT EXISTS user_id INTEGER"
+      "ALTER TABLE categories ADD COLUMN IF NOT EXISTS user_id INTEGER",
     );
 
     console.log("Adding foreign key constraint if not exists");
@@ -23,7 +23,7 @@ async function run() {
 
     console.log("Creating index on user_id if not exists");
     await prisma.$executeRawUnsafe(
-      "CREATE INDEX IF NOT EXISTS idx_categories_user_id ON categories(user_id)"
+      "CREATE INDEX IF NOT EXISTS idx_categories_user_id ON categories(user_id)",
     );
 
     console.log("Done.");

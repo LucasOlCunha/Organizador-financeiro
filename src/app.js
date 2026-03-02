@@ -6,6 +6,7 @@ import categoriesRouter from "./routes/categories.js";
 import transactionsRouter from "./routes/transactions.js";
 import balanceRouter from "./routes/balance.js";
 import reportsRouter from "./routes/reports.js";
+import banksRouter from "./routes/banks.js";
 
 const app = express();
 
@@ -52,6 +53,8 @@ app.use("/transactions", transactionsRouter);
 app.use("/balance", balanceRouter);
 // Conecta as rotas de relatórios
 app.use("/reports", reportsRouter);
+// Conecta as rotas de bancos
+app.use("/banks", banksRouter);
 
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () =>

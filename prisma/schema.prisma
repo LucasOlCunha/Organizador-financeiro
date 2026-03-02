@@ -21,6 +21,7 @@ model User {
   data_criacao DateTime      @default(now())
   categories   Category[]
   transactions Transaction[]
+  banks        Bank[]
 
   saldo_inicial Decimal      @db.Decimal(14, 2) @default(0.00)
 
@@ -41,6 +42,19 @@ model Category {
   @@map("categories")
 }
 
+model Bank {
+  id           Int           @id @default(autoincrement())
+  nome         String
+  saldo_inicial Decimal      @db.Decimal(14, 2) @default(0.00)
+  data_criacao DateTime      @default(now())
+  deleted_at   DateTime?
+  user         User?         @relation(fields: [user_id], references: [id])
+  user_id      Int?
+  transactions Transaction[]
+
+  @@map("banks")
+}
+
 model Transaction {
   id           Int       @id @default(autoincrement())
   descricao    String
@@ -49,6 +63,8 @@ model Transaction {
   deleted_at   DateTime?
   categoria    Category? @relation(fields: [categoria_id], references: [id])
   categoria_id Int?
+  banco        Bank?     @relation(fields: [banco_id], references: [id])
+  banco_id     Int?
   user         User?     @relation(fields: [user_id], references: [id])
   user_id      Int?
   data_criacao DateTime  @default(now())
